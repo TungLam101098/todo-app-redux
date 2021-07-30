@@ -1,56 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import React, { useRef } from "react";
+import { useDispatch } from "react-redux";
+import "./App.css";
+import TodoList from "./components/TodoList";
+import {
+  addTodoList,
+  statusFilterChanged,
+  todoToggled,
+  removeTodo
+} from "./features/appSlice";
 
 function App() {
+  const dispatch = useDispatch();
+  
+  dispatch(statusFilterChanged("Active"));
+  
+  const inputRef = useRef();
+
+  const submitForm = (e) => {
+    e.preventDefault();
+    if(!inputRef.current.value) return;
+    dispatch(addTodoList(inputRef.current.value));
+    inputRef.current.value = "";
+  };
+
+  const getTodo = (id) => {
+    dispatch(todoToggled(id));
+  }
+
+  const removeTodoById = (id) => {
+    dispatch(removeTodo(id))
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+      <form>
+        <input ref={inputRef} type="text" placeholder="Input text" />
+        <button style={{ display: "none" }} onClick={submitForm}>
+          Submit
+        </button>
+      </form>
+      <TodoList getTodo={getTodo} removeTodoById={removeTodoById} />
     </div>
   );
 }
